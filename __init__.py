@@ -1,2 +1,2 @@
 import sys
-sys.path.append('./crawl3')
+sys.path.append('./crawl')
