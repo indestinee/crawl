@@ -78,10 +78,20 @@ def toxml(data):
     return etree.HTML(data)
 
 def fix_url(text, protocol, host):
+    text = text.replace('\/', '/')
+    text = text.replace('\\"', '"')
+    text = text.replace('\\\'', '\'')
     for quote in '\'\"':
         for t in ['src', 'href']:
             text = re.sub('{} *= *{}//'.format(t, quote),\
                     '{}={}{}://'.format(t, quote, protocol), text)
             text = re.sub('{} *= *{}/'.format(t, quote),\
                     '{}={}{}://{}/'.format(t, quote, protocol, host), text)
+    return text
+
+def add_prefix(text, url):
+    for quote in '\'\"':
+        for t in ['href']:
+            text = re.sub('{} *= *{}http'.format(t, quote),\
+                    '{}={}{}http'.format(t, quote, url), text)
     return text

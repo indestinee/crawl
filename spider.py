@@ -5,7 +5,7 @@ from html_lib import *
 
 class Spider(requests.Session):
     def __init__(self,\
-            headers_path=cfg.headers_path, extra_header={}, cookies=None,\
+            headers, extra_header={}, cookies=None,\
             download_path=cfg.download_path, cache_path=cfg.html_path,\
             from_cache=False, save_cache=False, path_replace=None,\
             fix_url=False, encoding=None, **kwargs):
@@ -42,9 +42,10 @@ class Spider(requests.Session):
 
         self.encoding = encoding
 
-        self.headers = make_headers(headers_path)
+        self.headers = headers
         self.headers.update(extra_header)
-        self.headers.setdefault('cookies', cookies)
+        if cookies:
+            self.headers.setdefault('cookies', cookies)
 
 
         self.download_path = Cache(download_path)
