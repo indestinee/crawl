@@ -1,9 +1,37 @@
 import re
-from config import *
+# from config import *
 from utils import *
 from lxml import etree
+from urllib.parse import urljoin, quote, unquote
+from urllib.request import Request
+from html import unescape
 
-def make_headers(headers_path):
+
+
+def remove_3(url):# {{{
+    '''
+        remove # from url
+    '''
+    ph = url[::-1].find('/')
+    if ph == -1:
+        return url
+    
+    sharp = url[-ph:].find('#')
+    if sharp == -1:
+        return url
+
+    url = url[:len(url) - ph + sharp]
+    return url
+# }}}
+def make_headers(headers_path):# {{{
+    '''
+        @params:
+            headers_path (str)
+        
+        @return:
+            headers (dict)
+
+    '''
     headers = {}
     with open(headers_path, 'r') as f:
         lines = f.readlines()
@@ -12,65 +40,63 @@ def make_headers(headers_path):
             if x != -1:
                 headers[line[:x]] = line[x+2:-1]
     return headers
-
-def url_analysis(url):
+# }}}
+_spliturl_re_ = re.compile('(.*?)://(.*?)/(.*)\?(.*)')
+def split_url(url):# {{{
     '''
-    @params:
-        url (str): url
-    
-    @returns:
-        url, [protocol, host, path]
-        protocol default: http
+        (.*?)://(.*?)/(.*)\?(.*)'
+        protocol, host, path, params
     '''
-    x1 = url.find('://')
-    if x1 == -1:
-        url = '://'.join([cfg.default_url_protocol, url])
-        x1 = url.find('://')
-    
-    x2 = url[x1+3:].find('/')
-    if x2 == -1:
-        url += '/'
-        x2 += len(url)
-    else:
-        x2 += x1 + 3
+    url = remove_3(url)
+    if url.find('://') == -1:
+        url = '://' + url
 
-    return url, [url[:x1], url[x1+3:x2], url[x2+1:]]
+    if url[url.find('://')+3:].find('/') == -1:
+        url = url + '/'
 
-def fix_path(path, replace=None):
-    '''
-    @params:
-        path (str)
-        path_replace (str): str to replace /
+    if url.find('?') == -1:
+        url = url + '?'
 
-    @returns
-        path
-    '''
-    if path == '' or path[:-1] == '/':
-        path += 'index__.html'
-    
-    filename = path.split('/')[-1]
-    if filename.find('.') == -1:
-        path += '__.html'
-    
-    suffix = path.split('.')[-1].lower()
-    if suffix in cfg.default_html_replace_suffix:
-        path = path[:-len(suffix)] + 'html'
-
-    if replace:
-        path = path.replace('/', replace)
+    match = _spliturl_re_.match(url)
+    if match:
+        return match.groups()
+    return '', '', '', ''
+# }}}
+def get_host(url):# {{{
+    return split_url(url)[1]
+# }}}
+def fix_path(path, params=None, path_replace='/'):
+    path = path.replace('/', path_replace)
+    if path == '' or path[-1] == '/':
+        path = path + 'index.html'
+    if params:
+        suffix = path.split('.')[-1]
+        if suffix.find('/') != -1:
+            path = path + '?' + params
+        else:
+            path = path + '?' + params + '.' + suffix
     return path
 
-def ignore(text, ignores=cfg.default_ignores):
-    re_pattern = '(' +  '|'.join(ignores) + ')'
-    text = re.sub(re_pattern, '', text)
-    l = len(text)
-    while True:
-        text = text.replace('  ', ' ')
-        r = len(text)
-        if l == r:
-            break
-        l = r
-    return text
+def remove_tag(html, tag):
+    _tag_re_ = re.compile('<{}[^<>]*?>.*?</{}>'.format(tag, tag), re.S)
+    return _tag_re_.sub('\n', html)
+
+
+_tag_re_ = re.compile('<[^<>]*?>', re.S)
+def remove_tags(html):
+    '''
+        return list
+    '''
+    for tag in ['script', 'style']:
+        html = remove_tag(html, tag)
+    res = []
+    for each in _tag_re_.sub('\n', html).split('\n'):
+        row = each.strip()
+        if row == '':
+            continue
+        res.append(unescape(row))
+    return res
+    
 
 def toxml(data):
     if not isinstance(data, str):

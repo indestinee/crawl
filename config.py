@@ -1,5 +1,5 @@
 class Config:
-    headers_path='headers.txt'
+    headers_path='crawl/headers.txt'
     html_path='html_cache'
     download_path = 'downloads'
 

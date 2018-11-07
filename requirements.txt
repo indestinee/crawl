@@ -1,7 +1,0 @@
-requests
-lxml
-urllib3
-re
-json
-pickle
-sys

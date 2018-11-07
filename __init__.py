@@ -1,2 +1,2 @@
-import sys
-sys.path.append('./crawl')
+from . import spider
+from . import html_lib
