@@ -1,6 +1,6 @@
 import re
 # from config import *
-from utils import *
+from .utils import *
 from lxml import etree
 from urllib.parse import urljoin, quote, unquote
 from urllib.request import Request

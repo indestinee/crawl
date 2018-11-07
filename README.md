@@ -21,8 +21,10 @@ git submodule update --init --recursive # init all submodules
 ## usage
 ```python
 from crawl.spider import Spider
-spider = Spider(from_cache=True, save_cache=True)
+spider = Spider(headers_path='./crawl/headers.txt', from_cache=True, save_cache=True)
 response = spider.get('https://baidu.com/')
+response = spider.get('https://github.com/indestinee/crawl')
+jpg = spider.download('http://tp.yiaedu.com/showimg.php?url=http://uploads.xuexila.com/allimg/1703/867-1F330164643.jpg')
 ```
 
 ## components
