@@ -16,6 +16,7 @@ cd $PROJECT_PATH            # change directory
 git init                    # inititialize your git project
 git submodule add 'https://github.com/indestinee/crawl' # add crawl as submodule
 git submodule update --init --recursive # init all submodules
+# remove line #4 in submodule: ./utils.__init__.py 'from .database import DataBase' if you don't need database
 ```
 
 ## example
