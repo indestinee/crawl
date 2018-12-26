@@ -67,7 +67,7 @@ class Spider(requests.Session):
             save_cache (bool): wether to save cache
         '''
         cp.log(
-            'request (#b)GET(#) from (#b){}(#)'.format(url)
+            'request (#b)GET(#) from (#y){}(#)'.format(url)
         )
         return self._request('GET', url, *args, **kwargs)
     # }}}
@@ -80,7 +80,7 @@ class Spider(requests.Session):
             save_cache (bool): wether to save cache
         '''
         cp.log(
-            'send (#b)POST(#) to #(b){}(#)'.format(url)
+            'send (#b)POST(#) to (#y){}(#)'.format(url)
         )
         return self._request('POST', url, *args, **kwargs)
     # }}}
@@ -112,7 +112,7 @@ class Spider(requests.Session):
                 )
                 return response
 
-        response = super().request(method, url, *args, **kwargs)
+        # response = super().request(method, url, *args, **kwargs)
         try:
             response = super().request(method, url, *args, **kwargs)
             cp.suc(
